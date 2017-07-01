@@ -20,9 +20,8 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                //       .paths(PathSelectors.any())
-                .apis(RequestHandlerSelectors.basePackage("projectj.api.application.v1"))
-                .paths(PathSelectors.regex("/api/v1/users"))
+                .apis(RequestHandlerSelectors.basePackage(UserController.class.getPackage().getName()))
+                .paths(PathSelectors.regex(UserController.USER_URL))
                 .build();
     }
 }
