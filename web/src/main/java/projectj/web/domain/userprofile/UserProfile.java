@@ -28,7 +28,7 @@ public class UserProfile {
 
     @CommandHandler
     public UserProfile(CreateUserProfileCommand command) {
-        log.debug("_CommandHandler:UserProfile:{}", command);
+        log.info("_CommandHandler:UserProfile:{}", command);
         apply(UserProfileCreatedEvent.builder()
                 .userId(command.getUserId())
                 .email(command.getEmail())
@@ -39,7 +39,7 @@ public class UserProfile {
 
     @EventSourcingHandler
     public void on(UserProfileCreatedEvent event) {
-        log.debug("_EventListener:UserProfile:{}", event);
+        log.info("_EventListener:UserProfile:{}", event);
         this.userId = event.getUserId();
         this.nickname = event.getNickname();
         this.email = event.getEmail();

@@ -10,6 +10,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class UserProfileCreatedEvent {
 
     private UUID userId;

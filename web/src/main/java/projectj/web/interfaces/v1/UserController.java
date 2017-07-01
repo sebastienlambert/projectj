@@ -3,6 +3,7 @@ package projectj.web.interfaces.v1;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import static projectj.web.interfaces.v1.UserController.BASE_URL;
 @RestController
 @RequestMapping(value = BASE_URL + "/users")
 @Api
+@Slf4j
 public class UserController {
     static final String VERSION = "v1";
     static final String BASE_URL = "/api/" + VERSION;
@@ -33,6 +35,7 @@ public class UserController {
     @ApiOperation(value = "Create a new user")
     @RequestMapping(method = POST)
     public void createUser(@RequestBody @Valid UserDto user) {
+        log.info("_Controller:createUser:{}", user);
         CreateUserProfileCommand command = userMapper.toCreateUserProfileCommand(user);
         commandGateway.send(command);
     }
