@@ -16,15 +16,16 @@ import projectj.web.interfaces.v1.dto.UserMapper;
 import javax.validation.Valid;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static projectj.web.interfaces.v1.UserController.BASE_URL;
+import static projectj.web.interfaces.v1.UserController.USER_URL;
 
 @RestController
-@RequestMapping(value = BASE_URL + "/users")
+@RequestMapping(value = USER_URL)
 @Api
 @Slf4j
 public class UserController {
     static final String VERSION = "v1";
     static final String BASE_URL = "/api/" + VERSION;
+    public static final String USER_URL = BASE_URL + "/users";
 
     @Autowired
     private CommandGateway commandGateway;
