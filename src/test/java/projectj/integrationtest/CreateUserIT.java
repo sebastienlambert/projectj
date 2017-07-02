@@ -1,4 +1,4 @@
-package projectj.web.integrationtest;
+package projectj.integrationtest;
 
 
 import org.junit.Before;
@@ -11,12 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import projectj.web.Application;
-import projectj.web.api.userprofile.UserProfileCreatedEvent;
-import projectj.web.integrationtest.config.MockConfig;
-import projectj.web.interfaces.v1.UserController;
-import projectj.web.interfaces.v1.dto.UserDto;
-import projectj.web.query.userprofile.UserProfileListener;
+import projectj.Application;
+import projectj.api.userprofile.UserProfileCreatedEvent;
+import projectj.integrationtest.config.MockConfig;
+import projectj.query.userprofile.UserProfileListener;
+import projectj.web.v1.UserController;
+import projectj.web.v1.dto.UserDto;
 
 import java.util.List;
 import java.util.Map;

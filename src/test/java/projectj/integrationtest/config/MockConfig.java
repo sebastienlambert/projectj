@@ -1,4 +1,4 @@
-package projectj.web.integrationtest.config;
+package projectj.integrationtest.config;
 
 
 import org.springframework.context.annotation.Bean;

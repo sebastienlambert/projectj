@@ -1,7 +1,7 @@
-package projectj.web.interfaces.v1.dto;
+package projectj.web.v1.dto;
 
 
-import projectj.web.api.userprofile.CreateUserProfileCommand;
+import projectj.api.userprofile.CreateUserProfileCommand;
 
 public class UserMapper {
 

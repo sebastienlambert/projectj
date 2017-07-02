@@ -1,4 +1,4 @@
-package projectj.web.domain.userprofile;
+package projectj.command.userprofile;
 
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.messaging.interceptors.JSR303ViolationException;
@@ -6,8 +6,8 @@ import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.Before;
 import org.junit.Test;
-import projectj.web.api.userprofile.CreateUserProfileCommand;
-import projectj.web.api.userprofile.UserProfileCreatedEvent;
+import projectj.api.userprofile.CreateUserProfileCommand;
+import projectj.api.userprofile.UserProfileCreatedEvent;
 
 import java.util.UUID;
 

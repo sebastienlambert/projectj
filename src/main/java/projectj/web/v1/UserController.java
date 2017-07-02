@@ -1,4 +1,4 @@
-package projectj.web.interfaces.v1;
+package projectj.web.v1;
 
 
 import io.swagger.annotations.Api;
@@ -9,14 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import projectj.web.api.userprofile.CreateUserProfileCommand;
-import projectj.web.interfaces.v1.dto.UserDto;
-import projectj.web.interfaces.v1.dto.UserMapper;
+import projectj.api.userprofile.CreateUserProfileCommand;
+import projectj.web.v1.dto.UserDto;
+import projectj.web.v1.dto.UserMapper;
 
 import javax.validation.Valid;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static projectj.web.interfaces.v1.UserController.USER_URL;
+import static projectj.web.v1.UserController.USER_URL;
 
 @RestController
 @RequestMapping(value = USER_URL)

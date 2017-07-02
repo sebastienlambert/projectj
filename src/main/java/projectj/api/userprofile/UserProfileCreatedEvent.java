@@ -1,4 +1,4 @@
-package projectj.web.api.userprofile;
+package projectj.api.userprofile;
 
 
 import lombok.*;

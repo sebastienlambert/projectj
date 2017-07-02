@@ -1,12 +1,12 @@
-package projectj.web.domain.userprofile;
+package projectj.command.userprofile;
 
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
-import projectj.web.api.userprofile.CreateUserProfileCommand;
-import projectj.web.api.userprofile.UserProfileCreatedEvent;
+import projectj.api.userprofile.CreateUserProfileCommand;
+import projectj.api.userprofile.UserProfileCreatedEvent;
 
 import java.util.UUID;
 

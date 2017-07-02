@@ -1,4 +1,4 @@
-package projectj.web;
+package projectj;
 
 
 import org.axonframework.commandhandling.AsynchronousCommandBus;
