@@ -1,7 +1,9 @@
 package projectj.integrationtest;
 
 
-import org.junit.Before;
+import com.google.cloud.datastore.Datastore;
+import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.Key;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +28,19 @@ import static org.junit.Assert.*;
 
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {Application.class, UserProfileListener.class, MockConfig.class},
+@SpringBootTest(classes = {Application.class,
+        UserProfileListener.class,
+        MockConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CreateUserIT {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private Datastore datastore;
+
     private ResponseEntity<Map> lastResponse;
-
-
-    @Before
-    public void setUp() {
-        UserProfileListener.eventList.clear();
-    }
 
     @Test
     public void testCreateUser_whenUserDontExistYet() {
@@ -123,11 +125,17 @@ public class CreateUserIT {
     }
 
     private void expectUserProfile(UserProfileCreatedEvent event) {
-        assertTrue(UserProfileListener.eventList.contains(event));
+        Key key = datastore.newKeyFactory().setKind("UserProfileView").newKey(event.getUserId().toString());
+        Entity entity = datastore.get(key);
+        assertEquals(event.getNickname(), entity.getString("nickname"));
+        assertEquals(event.getEmail(), entity.getString("email"));
     }
 
     private void expectNoUserProfile(UserProfileCreatedEvent event) {
-        assertFalse(UserProfileListener.eventList.contains(event));
+        Key key = datastore.newKeyFactory().setKind("UserProfileView").newKey(event.getUserId().toString());
+        Entity entity = datastore.get(key);
+        assertNotEquals(event.getNickname(), entity.getString("nickname"));
+        assertNotEquals(event.getEmail(), entity.getString("email"));
     }
 
 
