@@ -22,6 +22,6 @@ public class UserProfileListener {
                 .nickname(event.getNickname())
                 .email(event.getEmail())
                 .build();
-        userProfileViewRepository.create(userProfileView);
+        userProfileViewRepository.save(userProfileView);
     }
 }

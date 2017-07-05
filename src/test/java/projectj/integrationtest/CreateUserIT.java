@@ -1,9 +1,6 @@
 package projectj.integrationtest;
 
 
-import com.google.cloud.datastore.Datastore;
-import com.google.cloud.datastore.Entity;
-import com.google.cloud.datastore.Key;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +14,14 @@ import projectj.Application;
 import projectj.api.userprofile.UserProfileCreatedEvent;
 import projectj.integrationtest.config.MockConfig;
 import projectj.query.userprofile.UserProfileListener;
+import projectj.query.userprofile.UserProfileView;
+import projectj.query.userprofile.UserProfileViewRepository;
 import projectj.web.v1.UserController;
 import projectj.web.v1.dto.UserDto;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -38,7 +40,7 @@ public class CreateUserIT {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private Datastore datastore;
+    private UserProfileViewRepository userProfileViewRepository;
 
     private ResponseEntity<Map> lastResponse;
 
@@ -125,17 +127,20 @@ public class CreateUserIT {
     }
 
     private void expectUserProfile(UserProfileCreatedEvent event) {
-        Key key = datastore.newKeyFactory().setKind("UserProfileView").newKey(event.getUserId().toString());
-        Entity entity = datastore.get(key);
-        assertEquals(event.getNickname(), entity.getString("nickname"));
-        assertEquals(event.getEmail(), entity.getString("email"));
+        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId());
+        assertEquals(event.getNickname(), userProfileView.getNickname());
+        assertEquals(event.getEmail(), userProfileView.getEmail());
+
+        Date now = new Date();
+        Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+        assertTrue(now.compareTo(userProfileView.getCreatedDate()) >= 0);
+        assertTrue(aMinuteAgo.compareTo(userProfileView.getCreatedDate()) <= 0);
     }
 
     private void expectNoUserProfile(UserProfileCreatedEvent event) {
-        Key key = datastore.newKeyFactory().setKind("UserProfileView").newKey(event.getUserId().toString());
-        Entity entity = datastore.get(key);
-        assertNotEquals(event.getNickname(), entity.getString("nickname"));
-        assertNotEquals(event.getEmail(), entity.getString("email"));
+        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId());
+        assertNotEquals(event.getNickname(), userProfileView.getNickname());
+        assertNotEquals(event.getEmail(), userProfileView.getEmail());
     }
 
 
