@@ -1,7 +1,7 @@
 package projectj.web.v1.dto;
 
 import org.junit.Test;
-import projectj.api.userprofile.CreateUserProfileCommand;
+import projectj.api.user.CreateUserCommand;
 
 import java.util.UUID;
 
@@ -17,12 +17,10 @@ public class UserMapperTest {
         UserDto userDto = UserDto.builder()
                 .userId(UUID.fromString("e641f7f0-4d33-4bd4-86e9-53beea9d55aa"))
                 .email("fred.flinststone@bedrock.net")
-                .nickname("fred")
                 .build();
-        CreateUserProfileCommand command = mapper.toCreateUserProfileCommand(userDto);
+        CreateUserCommand command = mapper.toCreateUserCommand(userDto);
         assertEquals("e641f7f0-4d33-4bd4-86e9-53beea9d55aa", command.getUserId().toString());
         assertEquals("fred.flinststone@bedrock.net", command.getEmail());
-        assertEquals("fred", command.getNickname());
     }
 
 }

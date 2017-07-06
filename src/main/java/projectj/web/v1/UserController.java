@@ -6,15 +6,18 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import projectj.api.userprofile.CreateUserProfileCommand;
+import projectj.api.user.CreateUserCommand;
 import projectj.web.v1.dto.UserDto;
 import projectj.web.v1.dto.UserMapper;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static projectj.web.v1.UserController.USER_URL;
 
@@ -33,11 +36,18 @@ public class UserController {
     private UserMapper userMapper = new UserMapper();
 
 
-    @ApiOperation(value = "Create a new user")
+    @ApiOperation("Create a new user")
     @RequestMapping(method = POST)
     public void createUser(@RequestBody @Valid UserDto user) {
         log.info("_Controller:createUser:{}", user);
-        CreateUserProfileCommand command = userMapper.toCreateUserProfileCommand(user);
+        CreateUserCommand command = userMapper.toCreateUserCommand(user);
         commandGateway.send(command);
     }
+
+    @ApiOperation("Get a specific user profile")
+    @RequestMapping(method = GET)
+    public UserDto getUser(@PathVariable UUID userId) {
+        return null;
+    }
+
 }

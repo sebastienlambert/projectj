@@ -1,4 +1,4 @@
-package projectj.api.userprofile;
+package projectj.api.user;
 
 
 import lombok.*;
@@ -11,9 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class UserProfileCreatedEvent {
+public class UserCreatedEvent {
 
     private UUID userId;
-    private String nickname;
     private String email;
 }

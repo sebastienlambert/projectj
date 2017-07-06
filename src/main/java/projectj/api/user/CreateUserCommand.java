@@ -1,4 +1,4 @@
-package projectj.api.userprofile;
+package projectj.api.user;
 
 
 import lombok.*;
@@ -7,7 +7,6 @@ import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Value
@@ -16,17 +15,10 @@ import java.util.UUID;
 @Wither
 @EqualsAndHashCode
 @ToString
-public class CreateUserProfileCommand {
+public class CreateUserCommand {
 
     @TargetAggregateIdentifier
     private UUID userId;
-
-    @NotNull(message = "Nickname is mandatory.")
-    @Size(min = 2,
-            max = 30,
-            message = "Nickname must be between {min} and {max} characters.")
-    private String nickname;
-
 
     @NotNull(message = "Email is mandatory.")
     @Pattern(regexp = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,64}",

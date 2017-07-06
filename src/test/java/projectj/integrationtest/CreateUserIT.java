@@ -11,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import projectj.Application;
-import projectj.api.userprofile.UserProfileCreatedEvent;
+import projectj.api.user.UserCreatedEvent;
 import projectj.integrationtest.config.MockConfig;
-import projectj.query.userprofile.UserProfileListener;
-import projectj.query.userprofile.UserProfileView;
-import projectj.query.userprofile.UserProfileViewRepository;
+import projectj.query.user.UserEventListener;
+import projectj.query.user.UserView;
+import projectj.query.user.UserViewRepository;
 import projectj.web.v1.UserController;
 import projectj.web.v1.dto.UserDto;
 
@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class,
-        UserProfileListener.class,
+        UserEventListener.class,
         MockConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CreateUserIT {
@@ -40,7 +40,7 @@ public class CreateUserIT {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private UserProfileViewRepository userProfileViewRepository;
+    private UserViewRepository userViewRepository;
 
     private ResponseEntity<Map> lastResponse;
 
@@ -49,9 +49,8 @@ public class CreateUserIT {
         UUID userId = UUID.randomUUID();
         whenCreateUser(userId, "homer", "homer.simpson@fox.net");
         expectHttpResponseOk();
-        expectUserProfile(UserProfileCreatedEvent.builder()
+        expectUserProfile(UserCreatedEvent.builder()
                 .userId(userId)
-                .nickname("homer")
                 .email("homer.simpson@fox.net")
                 .build());
     }
@@ -62,31 +61,16 @@ public class CreateUserIT {
         UUID userId = UUID.randomUUID();
         whenCreateUser(userId, "fred", "fred.flinststone@bedrock.net");
         whenCreateUser(userId, "homer", "homer.simpson@fox.net");
-        expectUserProfile(UserProfileCreatedEvent.builder()
+        expectUserProfile(UserCreatedEvent.builder()
                 .userId(userId)
-                .nickname("fred")
                 .email("fred.flinststone@bedrock.net")
                 .build());
-        expectNoUserProfile(UserProfileCreatedEvent.builder()
+        expectNoUserProfile(UserCreatedEvent.builder()
                 .userId(userId)
-                .nickname("homer")
                 .email("homer.simpson@fox.net")
                 .build());
     }
-
-    @Test
-    public void testCreateUser_whenMissingNicknameExpectError() {
-        UUID userId = UUID.randomUUID();
-        whenCreateUser(userId, null, "homer.simpson@fox.net");
-        expectHttpResponseBadResponse("NotNull.userDto.nickname");
-    }
-
-    @Test
-    public void testCreateUser_whenNicknameTooLongExpectError() {
-        UUID userId = UUID.randomUUID();
-        whenCreateUser(userId, "a very very long, too long nick name!!!!", "homer.simpson@fox.net");
-        expectHttpResponseBadResponse("Size.userDto.nickname");
-    }
+    
 
     @Test
     public void testCreateUser_whenMissingEmailExpectError() {
@@ -106,7 +90,6 @@ public class CreateUserIT {
     private void whenCreateUser(UUID userId, String nickname, String email) {
         UserDto userDto = UserDto.builder()
                 .userId(userId)
-                .nickname(nickname)
                 .email(email)
                 .build();
         lastResponse = restTemplate.postForEntity(UserController.USER_URL, userDto, Map.class);
@@ -126,21 +109,19 @@ public class CreateUserIT {
         assertTrue(errorCodes.contains(errorCode));
     }
 
-    private void expectUserProfile(UserProfileCreatedEvent event) {
-        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId());
-        assertEquals(event.getNickname(), userProfileView.getNickname());
-        assertEquals(event.getEmail(), userProfileView.getEmail());
+    private void expectUserProfile(UserCreatedEvent event) {
+        UserView userView = userViewRepository.findOne(event.getUserId());
+        assertEquals(event.getEmail(), userView.getEmail());
 
         Date now = new Date();
         Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
-        assertTrue(now.compareTo(userProfileView.getCreatedDate()) >= 0);
-        assertTrue(aMinuteAgo.compareTo(userProfileView.getCreatedDate()) <= 0);
+        assertTrue(now.compareTo(userView.getCreatedDate()) >= 0);
+        assertTrue(aMinuteAgo.compareTo(userView.getCreatedDate()) <= 0);
     }
 
-    private void expectNoUserProfile(UserProfileCreatedEvent event) {
-        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId());
-        assertNotEquals(event.getNickname(), userProfileView.getNickname());
-        assertNotEquals(event.getEmail(), userProfileView.getEmail());
+    private void expectNoUserProfile(UserCreatedEvent event) {
+        UserView userView = userViewRepository.findOne(event.getUserId());
+        assertNotEquals(event.getEmail(), userView.getEmail());
     }
 
 

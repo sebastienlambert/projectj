@@ -1,4 +1,4 @@
-package projectj.query.userprofile;
+package projectj.query.user;
 
 
 import org.junit.Before;
@@ -7,7 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import projectj.api.userprofile.UserProfileCreatedEvent;
+import projectj.api.user.UserCreatedEvent;
 
 import java.util.UUID;
 
@@ -16,13 +16,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 
-public class UserProfileListenerTest {
+public class UserEventListenerTest {
 
     @InjectMocks
-    private UserProfileListener userProfileListener;
+    private UserEventListener userEventListener;
 
     @Mock
-    private UserProfileViewRepository userProfileViewRepository;
+    private UserViewRepository userViewRepository;
 
 
     @Before
@@ -33,22 +33,20 @@ public class UserProfileListenerTest {
 
     @Test
     public void testOnUserProfileCreatedEvent() {
-        UserProfileCreatedEvent event = UserProfileCreatedEvent.builder()
+        UserCreatedEvent event = UserCreatedEvent.builder()
                 .userId(UUID.fromString("3e36b76e-1038-4e27-a52d-aac589e41d94"))
                 .email("fred.flinststone@bedrock.net")
-                .nickname("fred")
                 .build();
-        userProfileListener.on(event);
-        UserProfileView savedView = getSavedUserProfileView();
+        userEventListener.on(event);
+        UserView savedView = getSavedUserProfileView();
         assertEquals("3e36b76e-1038-4e27-a52d-aac589e41d94", savedView.getUserId().toString());
         assertEquals("fred.flinststone@bedrock.net", savedView.getEmail());
-        assertEquals("fred", savedView.getNickname());
     }
 
 
-    private UserProfileView getSavedUserProfileView() {
-        ArgumentCaptor<UserProfileView> argumentCaptor = ArgumentCaptor.forClass(UserProfileView.class);
-        verify(userProfileViewRepository, times(1)).save(argumentCaptor.capture());
+    private UserView getSavedUserProfileView() {
+        ArgumentCaptor<UserView> argumentCaptor = ArgumentCaptor.forClass(UserView.class);
+        verify(userViewRepository, times(1)).save(argumentCaptor.capture());
         return argumentCaptor.getValue();
     }
 

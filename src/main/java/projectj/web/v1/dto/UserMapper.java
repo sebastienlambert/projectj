@@ -1,15 +1,14 @@
 package projectj.web.v1.dto;
 
 
-import projectj.api.userprofile.CreateUserProfileCommand;
+import projectj.api.user.CreateUserCommand;
 
 public class UserMapper {
 
-    public CreateUserProfileCommand toCreateUserProfileCommand(UserDto userDto) {
-        return CreateUserProfileCommand.builder()
+    public CreateUserCommand toCreateUserCommand(UserDto userDto) {
+        return CreateUserCommand.builder()
                 .userId(userDto.getUserId())
                 .email(userDto.getEmail())
-                .nickname(userDto.getNickname())
                 .build();
     }
 }

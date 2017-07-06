@@ -1,4 +1,4 @@
-package projectj.query.userprofile;
+package projectj.query.user;
 
 
 import lombok.*;
@@ -20,16 +20,13 @@ import java.util.UUID;
 @ToString
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class UserProfileView {
+public class UserView {
 
     @Id
     private UUID userId;
 
     @CreatedDate
     private Date createdDate;
-
-    @Column
-    private String nickname;
 
     @Column
     private String email;
