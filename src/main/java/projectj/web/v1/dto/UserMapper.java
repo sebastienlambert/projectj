@@ -4,6 +4,9 @@ package projectj.web.v1.dto;
 import projectj.api.user.CreateUserCommand;
 import projectj.query.user.UserView;
 
+import java.time.ZoneId;
+import java.util.Date;
+
 public class UserMapper {
 
     public CreateUserCommand toCreateUserCommand(UserDto userDto) {
@@ -17,7 +20,7 @@ public class UserMapper {
         return UserDto.builder()
                 .userId(userView.getUserId())
                 .email(userView.getEmail())
-                .createdDate(userView.getCreatedDate())
+                .createdDate(Date.from(userView.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
                 .build();
     }
 }

@@ -4,6 +4,7 @@ import org.junit.Test;
 import projectj.api.user.CreateUserCommand;
 import projectj.query.user.UserView;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -32,12 +33,12 @@ public class UserMapperTest {
         UserView userView = UserView.builder()
                 .userId(UUID.fromString("e641f7f0-4d33-4bd4-86e9-53beea9d55aa"))
                 .email("fred.flinststone@bedrock.net")
-                .createdDate(new Date(1499347938619L))
+                .createdDate(LocalDateTime.of(2017, 7, 6, 21, 32, 18))
                 .build();
         UserDto userDto = mapper.toUserDto(userView);
         assertEquals("e641f7f0-4d33-4bd4-86e9-53beea9d55aa", userDto.getUserId().toString());
         assertEquals("fred.flinststone@bedrock.net", userDto.getEmail());
-        assertEquals(new Date(1499347938619L), userDto.getCreatedDate());
+        assertEquals(new Date(1499347938000L), userDto.getCreatedDate());
     }
 
 }

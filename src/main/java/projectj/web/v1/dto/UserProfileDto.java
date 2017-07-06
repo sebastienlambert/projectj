@@ -22,5 +22,5 @@ public class UserProfileDto {
             max = 30,
             message = "Nickname must be between {min} and {max} characters.")
     private String nickname;
-
+    
 }

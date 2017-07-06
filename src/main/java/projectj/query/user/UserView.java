@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -26,7 +26,7 @@ public class UserView {
     private UUID userId;
 
     @CreatedDate
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
     @Column
     private String email;
