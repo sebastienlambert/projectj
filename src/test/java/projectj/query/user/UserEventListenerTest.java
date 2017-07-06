@@ -32,19 +32,19 @@ public class UserEventListenerTest {
     }
 
     @Test
-    public void testOnUserProfileCreatedEvent() {
+    public void testOnUserCreatedEvent() {
         UserCreatedEvent event = UserCreatedEvent.builder()
                 .userId(UUID.fromString("3e36b76e-1038-4e27-a52d-aac589e41d94"))
                 .email("fred.flinststone@bedrock.net")
                 .build();
         userEventListener.on(event);
-        UserView savedView = getSavedUserProfileView();
+        UserView savedView = getSavedUserView();
         assertEquals("3e36b76e-1038-4e27-a52d-aac589e41d94", savedView.getUserId().toString());
         assertEquals("fred.flinststone@bedrock.net", savedView.getEmail());
     }
 
 
-    private UserView getSavedUserProfileView() {
+    private UserView getSavedUserView() {
         ArgumentCaptor<UserView> argumentCaptor = ArgumentCaptor.forClass(UserView.class);
         verify(userViewRepository, times(1)).save(argumentCaptor.capture());
         return argumentCaptor.getValue();

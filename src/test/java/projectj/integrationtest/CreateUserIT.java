@@ -11,12 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import projectj.Application;
-import projectj.api.user.UserCreatedEvent;
 import projectj.integrationtest.config.MockConfig;
 import projectj.query.user.UserEventListener;
 import projectj.web.v1.UserController;
+import projectj.web.v1.UserProfileController;
 import projectj.web.v1.dto.UserDto;
+import projectj.web.v1.dto.UserProfileDto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -43,58 +45,126 @@ public class CreateUserIT {
     @Test
     public void testCreateUser_whenUserDontExistYet() {
         UUID userId = UUID.randomUUID();
-        whenCreateUser(userId, "homer", "homer.simpson@fox.net");
+        whenCreateUser(userId, "homer.simpson@fox.net");
         expectHttpResponseOk();
 
         whenQueryUser(userId);
         expectHttpResponseOk();
-        expectUserCreated(UserCreatedEvent.builder()
-                .userId(userId)
-                .email("homer.simpson@fox.net")
-                .build());
+        expectUserCreated(userId, "homer.simpson@fox.net");
     }
 
 
     @Test
     public void testCreateUser_whenUserIdAlreadyUsedExpectNoAddedAgain() {
         UUID userId = UUID.randomUUID();
-        whenCreateUser(userId, "fred", "fred.flinststone@bedrock.net");
-        whenCreateUser(userId, "homer", "homer.simpson@fox.net");
+        whenCreateUser(userId, "fred.flinststone@bedrock.net");
+        whenCreateUser(userId, "homer.simpson@fox.net");
 
         whenQueryUser(userId);
         expectHttpResponseOk();
-        expectUserCreated(UserCreatedEvent.builder()
-                .userId(userId)
-                .email("fred.flinststone@bedrock.net")
-                .build());
-        expectUserNotCreated(UserCreatedEvent.builder()
-                .userId(userId)
-                .email("homer.simpson@fox.net")
-                .build());
+        expectUserCreated(userId, "fred.flinststone@bedrock.net");
+        expectUserNotCreated(userId, "homer.simpson@fox.net");
     }
 
 
     @Test
     public void testCreateUser_whenMissingEmailExpectError() {
         UUID userId = UUID.randomUUID();
-        whenCreateUser(userId, "homer", null);
+        whenCreateUser(userId, null);
         expectHttpResponseBadResponse("NotNull.userDto.email");
     }
 
     @Test
     public void testCreateUser_whenWrongFormatEmailExpectError() {
         UUID userId = UUID.randomUUID();
-        whenCreateUser(userId, "homer", "homer.not.email");
+        whenCreateUser(userId, "homer.not.email");
         expectHttpResponseBadResponse("Pattern.userDto.email");
     }
 
 
-    private void whenCreateUser(UUID userId, String nickname, String email) {
+    @Test
+    public void testCreateUserProfile_whenUserExists() {
+        UUID userId = UUID.randomUUID();
+        whenCreateUser(userId, "fred.flinststone@bedrock.net");
+        expectHttpResponseOk();
+
+        whenCreateUserProfile(userId, "fred", LocalDate.of(1929, 10, 1));
+        expectHttpResponseOk();
+
+//        whenQueryUserProfile(userId);
+//        expectHttpResponseOk();
+//        expectUserProfileCreated(userId, "fred", LocalDate.of(1929, 10, 1));
+    }
+    
+
+    @Test
+    public void testUpdateUserProfile_whenUserExists() {
+        UUID userId = UUID.randomUUID();
+        whenCreateUser(userId, "fred.flintstone@bedrock.net");
+        expectHttpResponseOk();
+
+        whenCreateUserProfile(userId, "fred", LocalDate.of(1929, 10, 1));
+        expectHttpResponseOk();
+
+        whenCreateUserProfile(userId, "fred.flintstone", LocalDate.of(1929, 10, 1));
+        expectHttpResponseOk();
+
+//        whenQueryUserProfile(userId);
+//        expectHttpResponseOk();
+//        expectUserProfileCreated(userId, "fred.flitstone", LocalDate.of(1929, 10, 1));
+    }
+
+
+    @Test
+    public void testCreateUserProfile_whenMissingNickname() {
+        UUID userId = UUID.randomUUID();
+        whenCreateUser(userId, "fred.flintstone@bedrock.net");
+        expectHttpResponseOk();
+
+        whenCreateUserProfile(userId, null, LocalDate.of(1929, 10, 1));
+        expectHttpResponseBadResponse("NotNull.userProfileDto.nickname");
+    }
+
+    @Test
+    public void testCreateUserProfile_whenTooLongNickname() {
+        UUID userId = UUID.randomUUID();
+        whenCreateUser(userId, "fred.flintstone@bedrock.net");
+        expectHttpResponseOk();
+
+        whenCreateUserProfile(userId, "A very very long, too long nickname!!!", LocalDate.of(1929, 10, 1));
+        expectHttpResponseBadResponse("Size.userProfileDto.nickname");
+    }
+
+    @Test
+    public void testCreateUserProfile_whenMissingDob() {
+        UUID userId = UUID.randomUUID();
+        whenCreateUser(userId, "fred.flintstone@bedrock.net");
+        expectHttpResponseOk();
+
+        whenCreateUserProfile(userId, "fred", null);
+        expectHttpResponseBadResponse("NotNull.userProfileDto.dob");
+    }
+
+
+    private void whenCreateUser(UUID userId, String email) {
         UserDto userDto = UserDto.builder()
                 .userId(userId)
                 .email(email)
                 .build();
         lastResponse = restTemplate.postForEntity(UserController.USERS_BASE_URL, userDto, String.class);
+    }
+
+    private void whenCreateUserProfile(UUID userId, String nickname, LocalDate dob) {
+        UserProfileDto.UserProfileDtoBuilder userProfileDtoBuilder = UserProfileDto.builder()
+                .userId(userId)
+                .nickname(nickname);
+
+        if (dob != null) {
+            userProfileDtoBuilder = userProfileDtoBuilder.dob(Date.from(dob.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+        }
+        UserProfileDto userProfileDto = userProfileDtoBuilder.build();
+        String url = UserProfileController.USER_PROFILES_BASE_URL.replace("{userId}", userId.toString());
+        lastResponse = restTemplate.postForEntity(url, userProfileDto, String.class);
     }
 
     private void whenQueryUser(UUID userId) {
@@ -118,9 +188,10 @@ public class CreateUserIT {
         assertTrue(errorCodes.contains(expectedErrorCode));
     }
 
-    private void expectUserCreated(UserCreatedEvent event) {
+    private void expectUserCreated(UUID userId, String email) {
         UserDto userDto = getResponseBody(UserDto.class);
-        assertEquals(event.getEmail(), userDto.getEmail());
+        assertEquals(userId, userDto.getUserId());
+        assertEquals(email, userDto.getEmail());
 
         Date now = new Date();
         Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
@@ -128,9 +199,10 @@ public class CreateUserIT {
         assertTrue(aMinuteAgo.compareTo(userDto.getCreatedDate()) <= 0);
     }
 
-    private void expectUserNotCreated(UserCreatedEvent event) {
+    private void expectUserNotCreated(UUID userId, String email) {
         UserDto userDto = getResponseBody(UserDto.class);
-        assertNotEquals(event.getEmail(), userDto.getEmail());
+        assertEquals(userId, userDto.getUserId());
+        assertNotEquals(email, userDto.getEmail());
     }
 
 

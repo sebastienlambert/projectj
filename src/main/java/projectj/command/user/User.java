@@ -7,6 +7,8 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
 import projectj.api.user.CreateUserCommand;
 import projectj.api.user.UserCreatedEvent;
+import projectj.api.user.profile.CreateUserProfileCommand;
+import projectj.api.user.profile.UserProfileCreatedEvent;
 
 import java.util.UUID;
 
@@ -20,6 +22,7 @@ public class User {
     private UUID userId;
 
     private String email;
+    private UserProfile userProfile;
 
     @SuppressWarnings("usused")
     private User() {
@@ -34,11 +37,30 @@ public class User {
                 .build());
     }
 
+    @CommandHandler
+    public void setUserProfile(CreateUserProfileCommand userProfileCommand) {
+        log.info("_CommandHandler:User:{}", userProfileCommand);
+        apply(UserProfileCreatedEvent.builder()
+                .userId(userId)
+                .nickname(userProfileCommand.getNickname())
+                .dob(userProfileCommand.getDob())
+                .build());
+    }
+
 
     @EventSourcingHandler
     public void on(UserCreatedEvent event) {
         log.info("_EventListener:User:{}", event);
         this.userId = event.getUserId();
         this.email = event.getEmail();
+    }
+
+    @EventSourcingHandler
+    public void on(UserProfileCreatedEvent event) {
+        log.info("_EventListener:User:{}", event);
+        this.userProfile = UserProfile.builder()
+                .nickname(event.getNickname())
+                .dob(event.getDob())
+                .build();
     }
 }

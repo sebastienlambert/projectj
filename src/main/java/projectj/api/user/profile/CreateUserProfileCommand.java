@@ -1,21 +1,24 @@
-package projectj.web.v1.dto;
+package projectj.api.user.profile;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.Wither;
+import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
+@Value
 @Getter
 @Builder
-@AllArgsConstructor
-@Value
-public class UserProfileDto {
+@Wither
+@EqualsAndHashCode
+@ToString
+public class CreateUserProfileCommand {
+
+    @TargetAggregateIdentifier
     private UUID userId;
 
     @NotNull(message = "Nickname is mandatory.")
@@ -26,5 +29,5 @@ public class UserProfileDto {
 
 
     @NotNull(message = "Date of birth is mandatory.")
-    private Date dob;
+    private LocalDate dob;
 }
