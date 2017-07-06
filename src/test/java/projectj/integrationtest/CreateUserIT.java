@@ -14,8 +14,6 @@ import projectj.Application;
 import projectj.api.user.UserCreatedEvent;
 import projectj.integrationtest.config.MockConfig;
 import projectj.query.user.UserEventListener;
-import projectj.query.user.UserView;
-import projectj.query.user.UserViewRepository;
 import projectj.web.v1.UserController;
 import projectj.web.v1.dto.UserDto;
 
@@ -39,17 +37,18 @@ public class CreateUserIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private UserViewRepository userViewRepository;
-
-    private ResponseEntity<Map> lastResponse;
+    private JsonSerializer jsonSerializer = new JsonSerializer();
+    private ResponseEntity<String> lastResponse;
 
     @Test
     public void testCreateUser_whenUserDontExistYet() {
         UUID userId = UUID.randomUUID();
         whenCreateUser(userId, "homer", "homer.simpson@fox.net");
         expectHttpResponseOk();
-        expectUserProfile(UserCreatedEvent.builder()
+
+        whenQueryUser(userId);
+        expectHttpResponseOk();
+        expectUserCreated(UserCreatedEvent.builder()
                 .userId(userId)
                 .email("homer.simpson@fox.net")
                 .build());
@@ -61,16 +60,19 @@ public class CreateUserIT {
         UUID userId = UUID.randomUUID();
         whenCreateUser(userId, "fred", "fred.flinststone@bedrock.net");
         whenCreateUser(userId, "homer", "homer.simpson@fox.net");
-        expectUserProfile(UserCreatedEvent.builder()
+
+        whenQueryUser(userId);
+        expectHttpResponseOk();
+        expectUserCreated(UserCreatedEvent.builder()
                 .userId(userId)
                 .email("fred.flinststone@bedrock.net")
                 .build());
-        expectNoUserProfile(UserCreatedEvent.builder()
+        expectUserNotCreated(UserCreatedEvent.builder()
                 .userId(userId)
                 .email("homer.simpson@fox.net")
                 .build());
     }
-    
+
 
     @Test
     public void testCreateUser_whenMissingEmailExpectError() {
@@ -92,37 +94,48 @@ public class CreateUserIT {
                 .userId(userId)
                 .email(email)
                 .build();
-        lastResponse = restTemplate.postForEntity(UserController.USER_URL, userDto, Map.class);
+        lastResponse = restTemplate.postForEntity(UserController.USERS_BASE_URL, userDto, String.class);
+    }
+
+    private void whenQueryUser(UUID userId) {
+        String url = UserController.USERS_BASE_URL + UserController.QUERY_URL;
+        lastResponse = restTemplate.getForEntity(url.replace("{userId}", userId.toString()), String.class);
     }
 
     private void expectHttpResponseOk() {
         assertEquals(HttpStatus.OK, lastResponse.getStatusCode());
     }
 
-    private void expectHttpResponseBadResponse(String errorCode) {
+    private void expectHttpResponseBadResponse(String expectedErrorCode) {
         assertEquals(HttpStatus.BAD_REQUEST, lastResponse.getStatusCode());
-        List errors = (List) lastResponse.getBody().get("errors");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseBody = getResponseBody(Map.class);
+        List errors = (List) responseBody.get("errors");
         @SuppressWarnings("unchecked")
         Map<String, Object> firstError = (Map<String, Object>) errors.get(0);
         @SuppressWarnings("unchecked")
         List<String> errorCodes = (List<String>) firstError.get("codes");
-        assertTrue(errorCodes.contains(errorCode));
+        assertTrue(errorCodes.contains(expectedErrorCode));
     }
 
-    private void expectUserProfile(UserCreatedEvent event) {
-        UserView userView = userViewRepository.findOne(event.getUserId());
-        assertEquals(event.getEmail(), userView.getEmail());
+    private void expectUserCreated(UserCreatedEvent event) {
+        UserDto userDto = getResponseBody(UserDto.class);
+        assertEquals(event.getEmail(), userDto.getEmail());
 
         Date now = new Date();
         Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
-        assertTrue(now.compareTo(userView.getCreatedDate()) >= 0);
-        assertTrue(aMinuteAgo.compareTo(userView.getCreatedDate()) <= 0);
+        assertTrue(now.compareTo(userDto.getCreatedDate()) >= 0);
+        assertTrue(aMinuteAgo.compareTo(userDto.getCreatedDate()) <= 0);
     }
 
-    private void expectNoUserProfile(UserCreatedEvent event) {
-        UserView userView = userViewRepository.findOne(event.getUserId());
-        assertNotEquals(event.getEmail(), userView.getEmail());
+    private void expectUserNotCreated(UserCreatedEvent event) {
+        UserDto userDto = getResponseBody(UserDto.class);
+        assertNotEquals(event.getEmail(), userDto.getEmail());
     }
 
+
+    private <T> T getResponseBody(Class<T> clazz) {
+        return jsonSerializer.deserialize(lastResponse.getBody(), clazz);
+    }
 
 }
