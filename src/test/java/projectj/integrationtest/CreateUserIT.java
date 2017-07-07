@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import projectj.Application;
 import projectj.integrationtest.config.MockConfig;
 import projectj.query.user.UserEventListener;
+import projectj.shared.DateUtils;
 import projectj.web.v1.UserController;
 import projectj.web.v1.UserProfileController;
 import projectj.web.v1.dto.UserDto;
@@ -20,7 +21,6 @@ import projectj.web.v1.dto.UserProfileDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +160,7 @@ public class CreateUserIT {
                 .nickname(nickname);
 
         if (dob != null) {
-            userProfileDtoBuilder = userProfileDtoBuilder.dob(Date.from(dob.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+            userProfileDtoBuilder = userProfileDtoBuilder.dob(DateUtils.toDate(dob));
         }
         UserProfileDto userProfileDto = userProfileDtoBuilder.build();
         String url = UserProfileController.USER_PROFILES_BASE_URL.replace("{userId}", userId.toString());
@@ -197,10 +197,10 @@ public class CreateUserIT {
         UserProfileDto userProfileDto = getResponseBody(UserProfileDto.class);
         assertEquals(userId, userProfileDto.getUserId());
         assertEquals(nickname, userProfileDto.getNickname());
-        assertEquals(Date.from(dob.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), userProfileDto.getDob());
+        assertEquals(DateUtils.toDate(dob), userProfileDto.getDob());
 
         Date now = new Date();
-        Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+        Date aMinuteAgo = DateUtils.toDate(LocalDateTime.now().minusMinutes(1));
         assertTrue(now.compareTo(userProfileDto.getCreatedDate()) >= 0);
         assertTrue(aMinuteAgo.compareTo(userProfileDto.getCreatedDate()) <= 0);
         assertTrue(now.compareTo(userProfileDto.getLastModifiedDate()) >= 0);
@@ -213,7 +213,7 @@ public class CreateUserIT {
         assertEquals(email, userDto.getEmail());
 
         Date now = new Date();
-        Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+        Date aMinuteAgo = DateUtils.toDate(LocalDateTime.now().minusMinutes(1));
         assertTrue(now.compareTo(userDto.getCreatedDate()) >= 0);
         assertTrue(aMinuteAgo.compareTo(userDto.getCreatedDate()) <= 0);
     }

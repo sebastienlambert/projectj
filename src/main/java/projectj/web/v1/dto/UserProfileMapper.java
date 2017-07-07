@@ -3,10 +3,10 @@ package projectj.web.v1.dto;
 
 import projectj.api.user.profile.CreateUserProfileCommand;
 import projectj.query.user.UserProfileView;
+import projectj.shared.DateUtils;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Date;
 
 public class UserProfileMapper {
 
@@ -22,9 +22,9 @@ public class UserProfileMapper {
         return UserProfileDto.builder()
                 .userId(userProfileView.getUserId())
                 .nickname(userProfileView.getNickname())
-                .dob(Date.from(userProfileView.getDob().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
-                .createdDate(Date.from(userProfileView.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()))
-                .lastModifiedDate(Date.from(userProfileView.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()))
+                .dob(DateUtils.toDate(userProfileView.getDob()))
+                .createdDate(DateUtils.toDate(userProfileView.getCreatedDate()))
+                .lastModifiedDate(DateUtils.toDate(userProfileView.getLastModifiedDate()))
                 .build();
     }
 }
