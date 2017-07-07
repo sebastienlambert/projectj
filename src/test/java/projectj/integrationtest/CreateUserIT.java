@@ -5,9 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import projectj.Application;
@@ -22,8 +19,6 @@ import projectj.web.v1.dto.UserProfileDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -37,10 +32,8 @@ import static org.junit.Assert.*;
 public class CreateUserIT {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private RestClient restClient;
 
-    private JsonSerializer jsonSerializer = new JsonSerializer();
-    private ResponseEntity<String> lastResponse;
 
     @Test
     public void testCreateUser_whenUserDontExistYet() {
@@ -51,6 +44,10 @@ public class CreateUserIT {
         whenQueryUser(userId);
         expectHttpResponseOk();
         expectUserCreated(userId, "homer.simpson@fox.net");
+    }
+
+    private void expectHttpResponseOk() {
+        restClient.expectHttpResponseOk();
     }
 
 
@@ -72,6 +69,10 @@ public class CreateUserIT {
         UUID userId = UUID.randomUUID();
         whenCreateUser(userId, null);
         expectHttpResponseBadResponse("NotNull.userDto.email");
+    }
+
+    private void expectHttpResponseBadResponse(String expectedErrorCode) {
+        restClient.expectHttpResponseBadResponse(expectedErrorCode);
     }
 
     @Test
@@ -151,7 +152,7 @@ public class CreateUserIT {
                 .userId(userId)
                 .email(email)
                 .build();
-        lastResponse = restTemplate.postForEntity(UserController.USERS_BASE_URL, userDto, String.class);
+        restClient.postForEntity(UserController.USERS_BASE_URL, userDto);
     }
 
     private void whenCreateUserProfile(UUID userId, String nickname, LocalDate dob) {
@@ -164,37 +165,22 @@ public class CreateUserIT {
         }
         UserProfileDto userProfileDto = userProfileDtoBuilder.build();
         String url = UserProfileController.USER_PROFILES_BASE_URL.replace("{userId}", userId.toString());
-        lastResponse = restTemplate.postForEntity(url, userProfileDto, String.class);
+        restClient.postForEntity(url, userProfileDto);
     }
 
     private void whenQueryUser(UUID userId) {
         String url = UserController.USERS_BASE_URL + UserController.QUERY_URL;
-        lastResponse = restTemplate.getForEntity(url.replace("{userId}", userId.toString()), String.class);
+        restClient.getForEntity(url.replace("{userId}", userId.toString()));
     }
 
     private void whenQueryUserProfile(UUID userId) {
         String url = UserProfileController.USER_PROFILES_BASE_URL.replace("{userId}", userId.toString());
-        lastResponse = restTemplate.getForEntity(url, String.class);
+        restClient.getForEntity(url);
     }
 
-    private void expectHttpResponseOk() {
-        assertEquals(HttpStatus.OK, lastResponse.getStatusCode());
-    }
-
-    private void expectHttpResponseBadResponse(String expectedErrorCode) {
-        assertEquals(HttpStatus.BAD_REQUEST, lastResponse.getStatusCode());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> responseBody = getResponseBody(Map.class);
-        List errors = (List) responseBody.get("errors");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> firstError = (Map<String, Object>) errors.get(0);
-        @SuppressWarnings("unchecked")
-        List<String> errorCodes = (List<String>) firstError.get("codes");
-        assertTrue(errorCodes.contains(expectedErrorCode));
-    }
 
     private void expectUserProfileCreated(UUID userId, String nickname, LocalDate dob) {
-        UserProfileDto userProfileDto = getResponseBody(UserProfileDto.class);
+        UserProfileDto userProfileDto = restClient.getResponseBody(UserProfileDto.class);
         assertEquals(userId, userProfileDto.getUserId());
         assertEquals(nickname, userProfileDto.getNickname());
         assertEquals(DateUtils.toDate(dob), userProfileDto.getDob());
@@ -208,7 +194,7 @@ public class CreateUserIT {
     }
 
     private void expectUserCreated(UUID userId, String email) {
-        UserDto userDto = getResponseBody(UserDto.class);
+        UserDto userDto = restClient.getResponseBody(UserDto.class);
         assertEquals(userId, userDto.getUserId());
         assertEquals(email, userDto.getEmail());
 
@@ -219,14 +205,10 @@ public class CreateUserIT {
     }
 
     private void expectUserNotCreated(UUID userId, String email) {
-        UserDto userDto = getResponseBody(UserDto.class);
+        UserDto userDto = restClient.getResponseBody(UserDto.class);
         assertEquals(userId, userDto.getUserId());
         assertNotEquals(email, userDto.getEmail());
     }
 
-
-    private <T> T getResponseBody(Class<T> clazz) {
-        return jsonSerializer.deserialize(lastResponse.getBody(), clazz);
-    }
 
 }
