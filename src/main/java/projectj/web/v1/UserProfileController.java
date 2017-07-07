@@ -5,15 +5,17 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import projectj.api.user.profile.CreateUserProfileCommand;
+import projectj.query.user.UserProfileView;
+import projectj.query.user.UserProfileViewRepository;
 import projectj.web.v1.dto.UserProfileDto;
 import projectj.web.v1.dto.UserProfileMapper;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static projectj.web.v1.PackageConstant.BASE_URL;
 import static projectj.web.v1.UserProfileController.USER_PROFILES_BASE_URL;
@@ -28,14 +30,28 @@ public class UserProfileController {
     @Autowired
     private CommandGateway commandGateway;
 
+    @Autowired
+    private UserProfileViewRepository userProfileViewRepository;
+
     private UserProfileMapper userProfileMapper = new UserProfileMapper();
 
 
     @ApiOperation("Create a new user profile")
     @RequestMapping(method = POST)
-    public void createUserProfile(@RequestBody @Valid UserProfileDto userProfile) {
+    public void createUserProfile(@PathVariable UUID userId, @RequestBody @Valid UserProfileDto userProfile) {
+        userProfile = userProfile.withUserId(userId);
         log.info("_Controller:createUserProfile:{}", userProfile);
         CreateUserProfileCommand command = userProfileMapper.toCreateUserProfileCommand(userProfile);
         commandGateway.send(command);
     }
+
+    @ApiOperation("Get user profile")
+    @RequestMapping(method = GET)
+    @ResponseBody
+    public UserProfileDto getUserProfile(@PathVariable UUID userId) {
+        log.info("_Controller:getUserProfile:{}", userId);
+        UserProfileView userProfileView = userProfileViewRepository.findOne(userId);
+        return userProfileMapper.toUserProfileDto(userProfileView);
+    }
+
 }

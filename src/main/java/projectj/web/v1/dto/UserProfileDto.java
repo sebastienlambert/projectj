@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
+import lombok.experimental.Wither;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -13,10 +14,14 @@ import java.util.UUID;
 
 @Getter
 @Builder
+@Wither
 @AllArgsConstructor
 @Value
 public class UserProfileDto {
     private UUID userId;
+
+    private Date createdDate;
+    private Date lastModifiedDate;
 
     @NotNull(message = "Nickname is mandatory.")
     @Size(min = 2,

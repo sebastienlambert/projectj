@@ -1,7 +1,9 @@
 package projectj.query.user;
 
 import lombok.*;
+import lombok.experimental.Wither;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@Wither
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -27,6 +30,9 @@ public class UserProfileView {
 
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     @Column
     private String nickname;

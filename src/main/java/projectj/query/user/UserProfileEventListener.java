@@ -16,11 +16,14 @@ public class UserProfileEventListener {
     @EventHandler
     public void on(UserProfileCreatedEvent event) {
         log.info("_Event:{}", event);
-        UserProfileView userProfileView = UserProfileView.builder()
-                .userId(event.getUserId())
-                .nickname(event.getNickname())
-                .dob(event.getDob())
-                .build();
+        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId());
+        if (userProfileView == null) {
+            userProfileView = UserProfileView.builder()
+                    .userId(event.getUserId())
+                    .build();
+        }
+        userProfileView.setDob(event.getDob());
+        userProfileView.setNickname(event.getNickname());
         userProfileViewRepository.save(userProfileView);
     }
 }

@@ -91,11 +91,11 @@ public class CreateUserIT {
         whenCreateUserProfile(userId, "fred", LocalDate.of(1929, 10, 1));
         expectHttpResponseOk();
 
-//        whenQueryUserProfile(userId);
-//        expectHttpResponseOk();
-//        expectUserProfileCreated(userId, "fred", LocalDate.of(1929, 10, 1));
+        whenQueryUserProfile(userId);
+        expectHttpResponseOk();
+        expectUserProfileCreated(userId, "fred", LocalDate.of(1929, 10, 1));
     }
-    
+
 
     @Test
     public void testUpdateUserProfile_whenUserExists() {
@@ -109,9 +109,9 @@ public class CreateUserIT {
         whenCreateUserProfile(userId, "fred.flintstone", LocalDate.of(1929, 10, 1));
         expectHttpResponseOk();
 
-//        whenQueryUserProfile(userId);
-//        expectHttpResponseOk();
-//        expectUserProfileCreated(userId, "fred.flitstone", LocalDate.of(1929, 10, 1));
+        whenQueryUserProfile(userId);
+        expectHttpResponseOk();
+        expectUserProfileCreated(userId, "fred.flintstone", LocalDate.of(1929, 10, 1));
     }
 
 
@@ -172,6 +172,11 @@ public class CreateUserIT {
         lastResponse = restTemplate.getForEntity(url.replace("{userId}", userId.toString()), String.class);
     }
 
+    private void whenQueryUserProfile(UUID userId) {
+        String url = UserProfileController.USER_PROFILES_BASE_URL.replace("{userId}", userId.toString());
+        lastResponse = restTemplate.getForEntity(url, String.class);
+    }
+
     private void expectHttpResponseOk() {
         assertEquals(HttpStatus.OK, lastResponse.getStatusCode());
     }
@@ -186,6 +191,20 @@ public class CreateUserIT {
         @SuppressWarnings("unchecked")
         List<String> errorCodes = (List<String>) firstError.get("codes");
         assertTrue(errorCodes.contains(expectedErrorCode));
+    }
+
+    private void expectUserProfileCreated(UUID userId, String nickname, LocalDate dob) {
+        UserProfileDto userProfileDto = getResponseBody(UserProfileDto.class);
+        assertEquals(userId, userProfileDto.getUserId());
+        assertEquals(nickname, userProfileDto.getNickname());
+        assertEquals(Date.from(dob.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()), userProfileDto.getDob());
+
+        Date now = new Date();
+        Date aMinuteAgo = Date.from(LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+        assertTrue(now.compareTo(userProfileDto.getCreatedDate()) >= 0);
+        assertTrue(aMinuteAgo.compareTo(userProfileDto.getCreatedDate()) <= 0);
+        assertTrue(now.compareTo(userProfileDto.getLastModifiedDate()) >= 0);
+        assertTrue(userProfileDto.getCreatedDate().compareTo(userProfileDto.getLastModifiedDate()) <= 0);
     }
 
     private void expectUserCreated(UUID userId, String email) {
