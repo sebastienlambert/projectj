@@ -6,7 +6,9 @@ import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
 import projectj.api.user.CreateUserCommand;
+import projectj.api.user.UpdateUserCommand;
 import projectj.api.user.UserCreatedEvent;
+import projectj.api.user.UserUpdatedEvent;
 import projectj.api.user.profile.CreateUserProfileCommand;
 import projectj.api.user.profile.UserProfileCreatedEvent;
 
@@ -38,6 +40,15 @@ public class User {
     }
 
     @CommandHandler
+    public void updateUser(UpdateUserCommand command) {
+        log.info("_CommandHandler:User:{}", command);
+        apply(UserUpdatedEvent.builder()
+                .userId(command.getUserId())
+                .email(command.getEmail())
+                .build());
+    }
+
+    @CommandHandler
     public void setUserProfile(CreateUserProfileCommand userProfileCommand) {
         log.info("_CommandHandler:User:{}", userProfileCommand);
         apply(UserProfileCreatedEvent.builder()
@@ -50,6 +61,13 @@ public class User {
 
     @EventSourcingHandler
     public void on(UserCreatedEvent event) {
+        log.info("_EventListener:User:{}", event);
+        this.userId = event.getUserId();
+        this.email = event.getEmail();
+    }
+
+    @EventSourcingHandler
+    public void on(UserUpdatedEvent event) {
         log.info("_EventListener:User:{}", event);
         this.userId = event.getUserId();
         this.email = event.getEmail();

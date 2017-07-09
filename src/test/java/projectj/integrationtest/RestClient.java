@@ -2,6 +2,7 @@ package projectj.integrationtest;
 
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.PUT;
 
 public class RestClient {
 
@@ -26,7 +28,11 @@ public class RestClient {
         assertEquals(HttpStatus.OK, lastResponse.getStatusCode());
     }
 
-    public void expectHttpResponseBadResponse(String expectedErrorCode) {
+    public void expectHttpResponseNotFound() {
+        assertEquals(HttpStatus.NOT_FOUND, lastResponse.getStatusCode());
+    }
+
+    public void expectHttpResponseBadRequest(String expectedErrorCode) {
         assertEquals(HttpStatus.BAD_REQUEST, lastResponse.getStatusCode());
         @SuppressWarnings("unchecked")
         Map<String, Object> responseBody = getResponseBody(Map.class);
@@ -38,9 +44,13 @@ public class RestClient {
         assertTrue(errorCodes.contains(expectedErrorCode));
     }
 
-
     public void postForEntity(String url, Object body) {
         lastResponse = restTemplate.postForEntity(url, body, String.class);
+    }
+
+    public void putForEntity(String url, Object body) {
+        HttpEntity<Object> httpEntity = new HttpEntity<>(body);
+        lastResponse = restTemplate.exchange(url, PUT, httpEntity, String.class);
     }
 
     public void getForEntity(String url) {

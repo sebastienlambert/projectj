@@ -34,7 +34,7 @@ public class UserIT {
         userFixture
                 .whenQueryUser(userId)
                 .expectHttpResponseOk()
-                .expectUserCreated(userId, "homer.simpson@fox.net");
+                .expectUser(userId, "homer.simpson@fox.net");
     }
 
 
@@ -46,7 +46,7 @@ public class UserIT {
                 .whenCreateUser(userId, "homer.simpson@fox.net")
                 .whenQueryUser(userId)
                 .expectHttpResponseOk()
-                .expectUserCreated(userId, "fred.flinststone@bedrock.net")
+                .expectUser(userId, "fred.flinststone@bedrock.net")
                 .expectUserNotCreated(userId, "homer.simpson@fox.net");
     }
 
@@ -56,7 +56,7 @@ public class UserIT {
         UUID userId = UUID.randomUUID();
         userFixture
                 .whenCreateUser(userId, null)
-                .expectHttpResponseBadResponse("NotNull.userDto.email");
+                .expectHttpResponseBadRequest("NotNull.userDto.email");
     }
 
 
@@ -65,6 +65,51 @@ public class UserIT {
         UUID userId = UUID.randomUUID();
         userFixture
                 .whenCreateUser(userId, "homer.not.email")
-                .expectHttpResponseBadResponse("Pattern.userDto.email");
+                .expectHttpResponseBadRequest("Pattern.userDto.email");
     }
+
+
+    @Test
+    public void testUpdateUser_whenUserExist() {
+        UUID userId = UUID.randomUUID();
+        userFixture
+                .whenCreateUser(userId, "fred.flinststone@bedrock.net")
+                .expectHttpResponseOk()
+                .whenUpdateUser(userId, "wilma.flinststone@bedrock.net")
+                .expectHttpResponseOk()
+                .whenQueryUser(userId)
+                .expectHttpResponseOk()
+                .expectUser(userId, "wilma.flinststone@bedrock.net");
+    }
+
+
+    @Test
+    public void testUpdateUser_whenMissingEmailExpectError() {
+        UUID userId = UUID.randomUUID();
+        userFixture
+                .whenCreateUser(userId, "fred.flinststone@bedrock.net")
+                .expectHttpResponseOk()
+                .whenUpdateUser(userId, null)
+                .expectHttpResponseBadRequest("NotNull.userDto.email");
+    }
+
+
+    @Test
+    public void testUpdateUser_whenWrongFormatEmailExpectError() {
+        UUID userId = UUID.randomUUID();
+        userFixture
+                .whenCreateUser(userId, "fred.flinststone@bedrock.net")
+                .expectHttpResponseOk()
+                .whenUpdateUser(userId, "homer.not.email")
+                .expectHttpResponseBadRequest("Pattern.userDto.email");
+    }
+
+    @Test
+    public void testQueryUser_whenUserDontExistsExpectNotFound() {
+        UUID userId = UUID.randomUUID();
+        userFixture
+                .whenQueryUser(userId)
+                .expectHttpResponseNotFound();
+    }
+
 }

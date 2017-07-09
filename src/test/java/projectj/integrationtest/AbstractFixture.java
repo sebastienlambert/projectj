@@ -11,8 +11,13 @@ public abstract class AbstractFixture<T extends AbstractFixture> {
     @Getter(PROTECTED)
     private RestClient restClient;
 
-    public T expectHttpResponseBadResponse(String expectedErrorCode) {
-        restClient.expectHttpResponseBadResponse(expectedErrorCode);
+    public T expectHttpResponseBadRequest(String expectedErrorCode) {
+        restClient.expectHttpResponseBadRequest(expectedErrorCode);
+        return (T) this;
+    }
+
+    public T expectHttpResponseNotFound() {
+        restClient.expectHttpResponseNotFound();
         return (T) this;
     }
 

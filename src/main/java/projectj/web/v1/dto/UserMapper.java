@@ -2,6 +2,7 @@ package projectj.web.v1.dto;
 
 
 import projectj.api.user.CreateUserCommand;
+import projectj.api.user.UpdateUserCommand;
 import projectj.query.user.UserView;
 import projectj.shared.DateUtils;
 
@@ -9,6 +10,13 @@ public class UserMapper {
 
     public CreateUserCommand toCreateUserCommand(UserDto userDto) {
         return CreateUserCommand.builder()
+                .userId(userDto.getUserId())
+                .email(userDto.getEmail())
+                .build();
+    }
+
+    public UpdateUserCommand toUpdateUserCommand(UserDto userDto) {
+        return UpdateUserCommand.builder()
                 .userId(userDto.getUserId())
                 .email(userDto.getEmail())
                 .build();

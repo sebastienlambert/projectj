@@ -18,7 +18,7 @@ public class UserFixture extends AbstractFixture<UserFixture> {
     }
 
     public UserFixture whenQueryUser(UUID userId) {
-        String url = UserController.USERS_BASE_URL + UserController.QUERY_URL;
+        String url = UserController.USERS_BASE_URL + UserController.USER_ID_URL;
         getRestClient().getForEntity(url.replace("{userId}", userId.toString()));
         return this;
     }
@@ -32,8 +32,18 @@ public class UserFixture extends AbstractFixture<UserFixture> {
         return this;
     }
 
+    public UserFixture whenUpdateUser(UUID userId, String email) {
+        String url = (UserController.USERS_BASE_URL + UserController.USER_ID_URL).replace("{userId}", userId.toString());
+        UserDto userDto = UserDto.builder()
+                .userId(userId)
+                .email(email)
+                .build();
+        getRestClient().putForEntity(url, userDto);
+        return this;
+    }
 
-    public UserFixture expectUserCreated(UUID userId, String email) {
+
+    public UserFixture expectUser(UUID userId, String email) {
         UserDto userDto = getRestClient().getResponseBody(UserDto.class);
         assertEquals(userId, userDto.getUserId());
         assertEquals(email, userDto.getEmail());

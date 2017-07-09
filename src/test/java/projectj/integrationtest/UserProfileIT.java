@@ -75,7 +75,7 @@ public class UserProfileIT {
 
         userProfileFixture
                 .whenCreateUserProfile(userId, null, LocalDate.of(1929, 10, 1))
-                .expectHttpResponseBadResponse("NotNull.userProfileDto.nickname");
+                .expectHttpResponseBadRequest("NotNull.userProfileDto.nickname");
     }
 
     @Test
@@ -87,7 +87,7 @@ public class UserProfileIT {
 
         userProfileFixture
                 .whenCreateUserProfile(userId, "A very very long, too long nickname!!!", LocalDate.of(1929, 10, 1))
-                .expectHttpResponseBadResponse("Size.userProfileDto.nickname");
+                .expectHttpResponseBadRequest("Size.userProfileDto.nickname");
     }
 
     @Test
@@ -99,6 +99,6 @@ public class UserProfileIT {
 
         userProfileFixture
                 .whenCreateUserProfile(userId, "fred", null)
-                .expectHttpResponseBadResponse("NotNull.userProfileDto.dob");
+                .expectHttpResponseBadRequest("NotNull.userProfileDto.dob");
     }
 }
