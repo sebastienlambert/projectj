@@ -101,4 +101,13 @@ public class UserProfileIT {
                 .whenCreateUserProfile(userId, "fred", null)
                 .expectHttpResponseBadRequest("NotNull.userProfileDto.dob");
     }
+
+
+    @Test
+    public void testGetUserProfile_whenProfileDontExistsExpectNotFound() {
+        UUID userId = UUID.randomUUID();
+        userProfileFixture
+                .whenQueryUserProfile(userId)
+                .expectHttpResponseNotFound();
+    }
 }

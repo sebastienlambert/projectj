@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import projectj.api.user.profile.CreateUserProfileCommand;
 import projectj.query.user.UserProfileView;
 import projectj.query.user.UserProfileViewRepository;
+import projectj.web.v1.dto.NotFoundException;
 import projectj.web.v1.dto.UserProfileDto;
 import projectj.web.v1.dto.UserProfileMapper;
 
@@ -51,6 +52,9 @@ public class UserProfileController {
     public UserProfileDto getUserProfile(@PathVariable UUID userId) {
         log.info("_Controller:getUserProfile:{}", userId);
         UserProfileView userProfileView = userProfileViewRepository.findOne(userId);
+        if (userProfileView == null) {
+            throw new NotFoundException(String.format("User profile %s not found", userId));
+        }
         return userProfileMapper.toUserProfileDto(userProfileView);
     }
 
