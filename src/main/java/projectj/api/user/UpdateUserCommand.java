@@ -7,6 +7,7 @@ import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Value
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Wither
 @EqualsAndHashCode
 @ToString
-public class UpdateUserCommand {
+public class UpdateUserCommand implements Serializable {
 
     @TargetAggregateIdentifier
     private UUID userId;
@@ -24,4 +25,6 @@ public class UpdateUserCommand {
     @Pattern(regexp = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,64}",
             message = "Wrong email format: '${validatedValue}'.")
     private String email;
+
+    private int serialId;
 }

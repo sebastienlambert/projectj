@@ -7,6 +7,7 @@ import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Wither
 @EqualsAndHashCode
 @ToString
-public class CreateUserProfileCommand {
+public class CreateUserProfileCommand implements Serializable {
 
     @TargetAggregateIdentifier
     private UUID userId;

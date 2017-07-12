@@ -8,7 +8,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import projectj.Application;
 import projectj.integrationtest.config.MockConfig;
-import projectj.query.user.UserEventListener;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,7 +15,6 @@ import java.util.UUID;
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class,
-        UserEventListener.class,
         MockConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserProfileIT {

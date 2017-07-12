@@ -61,21 +61,21 @@ public class User {
 
     @EventSourcingHandler
     public void on(UserCreatedEvent event) {
-        log.info("_EventListener:User:{}", event);
+        log.info("_EventHandler:User:{}", event);
         this.userId = event.getUserId();
         this.email = event.getEmail();
     }
 
     @EventSourcingHandler
     public void on(UserUpdatedEvent event) {
-        log.info("_EventListener:User:{}", event);
+        log.info("_EventHandler:User:{}", event);
         this.userId = event.getUserId();
         this.email = event.getEmail();
     }
 
     @EventSourcingHandler
     public void on(UserProfileCreatedEvent event) {
-        log.info("_EventListener:User:{}", event);
+        log.info("_EventHandler:User:{}", event);
         this.userProfile = UserProfile.builder()
                 .nickname(event.getNickname())
                 .dob(event.getDob())
