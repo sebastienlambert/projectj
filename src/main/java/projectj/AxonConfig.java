@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017.  - Sebastien Lambert - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Sebastien Lambert
+ */
+
 package projectj;
 
 
@@ -58,7 +65,6 @@ public class AxonConfig {
     static class AxonEventHandlingConfig {
         @Autowired
         public void configure(EventHandlingConfiguration configuration) {
-            // configuration.usingTrackingProcessors();
             configuration.registerTrackingProcessor(UserEventListener.class.getPackage().getName());
         }
 
