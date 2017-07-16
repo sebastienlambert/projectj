@@ -20,6 +20,7 @@ import org.axonframework.messaging.MessageHandler;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -82,16 +83,11 @@ public class GuaranteedOrderCommandBus implements CommandBus {
 
     private <C> byte[] serializeCommandMessage(CommandMessage<C> commandMessage) {
         try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutput out = null;
-            try {
-                out = new ObjectOutputStream(bos);
-
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                 ObjectOutput out = new ObjectOutputStream(bos)) {
                 out.writeObject(commandMessage);
                 out.flush();
                 return bos.toByteArray();
-            } finally {
-                bos.close();
             }
         } catch (IOException ex) {
             throw new IllegalStateException(String.format("Failed to serialize command %s", commandMessage.getPayload()), ex);
@@ -100,15 +96,9 @@ public class GuaranteedOrderCommandBus implements CommandBus {
 
     private CommandMessage deserializeCommandMessage(byte[] serialized) {
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(serialized);
-            ObjectInput in = null;
-            try {
-                in = new ObjectInputStream(bis);
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(serialized);
+                 ObjectInput in = new ObjectInputStream(bis)) {
                 return (CommandMessage) in.readObject();
-            } finally {
-                if (in != null) {
-                    in.close();
-                }
             }
         } catch (ClassNotFoundException | IOException ex) {
             throw new IllegalStateException("Failed to deserialize command", ex);
@@ -120,7 +110,7 @@ public class GuaranteedOrderCommandBus implements CommandBus {
         return Stream.of(fields)
                 .filter(f -> f.isAnnotationPresent(TargetAggregateIdentifier.class))
                 .map(f -> safeAccessField(f, commandPayload))
-                .filter(value -> value != null)
+                .filter(Objects::nonNull)
                 .map(Object::toString)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Command payload without aggregate id: %s", commandPayload)));

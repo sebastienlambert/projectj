@@ -27,11 +27,15 @@ import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 @Slf4j
 public class User {
 
+    private static final String LOGKEY_COMMAND_HANDLER = "_CommandHandler:User:{}";
+    private static final String LOGKEY_EVENT_HANDLER = "_EventHandler:User:{}";
+
     @AggregateIdentifier
     private UUID userId;
 
     private String email;
     private UserProfile userProfile;
+
 
     @SuppressWarnings("usused")
     private User() {
@@ -39,7 +43,7 @@ public class User {
 
     @CommandHandler
     public User(CreateUserCommand command) {
-        log.info("_CommandHandler:User:{}", command);
+        log.info(LOGKEY_COMMAND_HANDLER, command);
         apply(UserCreatedEvent.builder()
                 .userId(command.getUserId())
                 .email(command.getEmail())
@@ -48,7 +52,7 @@ public class User {
 
     @CommandHandler
     public void updateUser(UpdateUserCommand command) {
-        log.info("_CommandHandler:User:{}", command);
+        log.info(LOGKEY_COMMAND_HANDLER, command);
         apply(UserUpdatedEvent.builder()
                 .userId(command.getUserId())
                 .email(command.getEmail())
@@ -57,7 +61,7 @@ public class User {
 
     @CommandHandler
     public void setUserProfile(CreateUserProfileCommand userProfileCommand) {
-        log.info("_CommandHandler:User:{}", userProfileCommand);
+        log.info(LOGKEY_COMMAND_HANDLER, userProfileCommand);
         apply(UserProfileCreatedEvent.builder()
                 .userId(userId)
                 .nickname(userProfileCommand.getNickname())
@@ -68,21 +72,21 @@ public class User {
 
     @EventSourcingHandler
     public void on(UserCreatedEvent event) {
-        log.info("_EventHandler:User:{}", event);
+        log.info(LOGKEY_EVENT_HANDLER, event);
         this.userId = event.getUserId();
         this.email = event.getEmail();
     }
 
     @EventSourcingHandler
     public void on(UserUpdatedEvent event) {
-        log.info("_EventHandler:User:{}", event);
+        log.info(LOGKEY_EVENT_HANDLER, event);
         this.userId = event.getUserId();
         this.email = event.getEmail();
     }
 
     @EventSourcingHandler
     public void on(UserProfileCreatedEvent event) {
-        log.info("_EventHandler:User:{}", event);
+        log.info(LOGKEY_EVENT_HANDLER, event);
         this.userProfile = UserProfile.builder()
                 .nickname(event.getNickname())
                 .dob(event.getDob())

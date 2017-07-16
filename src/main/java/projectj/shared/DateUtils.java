@@ -15,6 +15,10 @@ import java.util.Date;
 
 public class DateUtils {
 
+    private DateUtils() {
+    }
+
+
     public static LocalDateTime toLocalDateTime(Date date) {
         if (date == null) {
             return null;

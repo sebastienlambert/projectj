@@ -28,7 +28,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage(UserController.class.getPackage().getName()))
-                .paths(PathSelectors.regex(String.format("/api/v1/.*")))
+                .paths(PathSelectors.regex("/api/v1/.*"))
                 .build();
     }
 }

@@ -8,7 +8,7 @@
 package projectj.web.v1;
 
 
-public interface PackageConstant {
-    String VERSION = "v1";
-    String BASE_URL = "/api/" + VERSION;
+public abstract class AbstractController {
+    public static final String VERSION = "v1";
+    public static final String BASE_URL = "/api/" + VERSION;
 }

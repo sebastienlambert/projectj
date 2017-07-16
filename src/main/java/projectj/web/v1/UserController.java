@@ -26,14 +26,13 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
-import static projectj.web.v1.PackageConstant.BASE_URL;
 import static projectj.web.v1.UserController.USERS_BASE_URL;
 
 @RestController
 @RequestMapping(value = USERS_BASE_URL)
 @Api
 @Slf4j
-public class UserController {
+public class UserController extends AbstractController {
     public static final String USERS_BASE_URL = BASE_URL + "/users";
     public static final String USER_ID_URL = "/{userId}";
 

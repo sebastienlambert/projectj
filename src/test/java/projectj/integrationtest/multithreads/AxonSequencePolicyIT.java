@@ -22,7 +22,9 @@ import projectj.Application;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -68,13 +70,9 @@ public class AxonSequencePolicyIT {
             });
         }
 
-        for (int i = 0; i < 3000; i++) {
-            if (aggregateIds.stream().allMatch(id -> myAggregateEventListener.getSequenceNoByAggregateId().get(id) == MAX_LOOP_COUNT)) {
-                break;
-            }
-            Thread.yield();
-            Thread.sleep(10L);
-        }
+        await().atMost(30, TimeUnit.SECONDS)
+                .until(() -> aggregateIds.stream()
+                        .allMatch(id -> myAggregateEventListener.getSequenceNoByAggregateId().get(id) == MAX_LOOP_COUNT));
 
         aggregateIds.forEach(id -> {
             assertEquals(MAX_LOOP_COUNT, myAggregateEventListener.getSequenceNoByAggregateId().get(id).intValue());

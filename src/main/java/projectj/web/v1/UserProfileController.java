@@ -25,14 +25,13 @@ import java.util.UUID;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static projectj.web.v1.PackageConstant.BASE_URL;
 import static projectj.web.v1.UserProfileController.USER_PROFILES_BASE_URL;
 
 @RestController
 @RequestMapping(value = USER_PROFILES_BASE_URL)
 @Api
 @Slf4j
-public class UserProfileController {
+public class UserProfileController extends AbstractController {
     public static final String USER_PROFILES_BASE_URL = BASE_URL + "/users/{userId}/profiles";
 
     @Autowired
