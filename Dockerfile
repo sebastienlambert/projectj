@@ -1,5 +1,6 @@
 FROM openjdk:8
 RUN apt-get update
-COPY target/projectj-web-1.5.4.RELEASE.jar /app.jar
-EXPOSE 8080/tcp
+COPY target/projectj-web-*.jar /app.jar
+COPY E:\Workspace\Security\keystore.p12 /keystore.p12
+EXPOSE 8443/tcp
 ENTRYPOINT ["java", "-jar", "/app.jar"]
