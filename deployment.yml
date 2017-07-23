@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: projectj-deployment
+  labels:
+    app: projectj-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: projectj-deployment
+    spec:
+      #Container details
+      containers:
+        - image: asia.gcr.io/projectj-174412/projectj:0.0.1-SNAPSHOT
+          name: projectj-container
+          imagePullPolicy: Always
+          #Ports to expose
+          ports:
+          - containerPort: 8443
+
+        - image: gcr.io/cloudsql-docker/gce-proxy:1.09
+          name: cloudsql-proxy-container
+          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                      "-instances=projectj-174412:asia-east1:projectj-db3=tcp:3306",
+                    "-credential_file=/secrets/cloudsql/credentials.json"]
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+            - name: ssl-certs
+              mountPath: /etc/ssl/certs
+            - name: cloudsql
+              mountPath: /cloudsql
+        # [END proxy_container]
+      # [START volumes]
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs
+        - name: cloudsql
+          emptyDir:
+      # [END volumes]

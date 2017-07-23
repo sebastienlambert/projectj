@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: projectj-service
+spec:
+  selector:
+    app: projectj-deployment
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: LoadBalancer
