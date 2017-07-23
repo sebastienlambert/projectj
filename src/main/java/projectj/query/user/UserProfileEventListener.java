@@ -23,10 +23,10 @@ public class UserProfileEventListener {
     @EventHandler
     public void on(UserProfileCreatedEvent event) {
         log.info("_Event:{}", event);
-        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId());
+        UserProfileView userProfileView = userProfileViewRepository.findOne(event.getUserId().toString());
         if (userProfileView == null) {
             userProfileView = UserProfileView.builder()
-                    .userId(event.getUserId())
+                    .userId(event.getUserId().toString())
                     .build();
         }
         userProfileView.setDob(event.getDob());

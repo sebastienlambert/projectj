@@ -26,7 +26,7 @@ public class UserEventListener {
     public void on(UserCreatedEvent event) {
         log.info("_Event:{}", event);
         UserView userView = UserView.builder()
-                .userId(event.getUserId())
+                .userId(event.getUserId().toString())
                 .email(event.getEmail())
                 .build();
         userViewRepository.save(userView);
@@ -35,7 +35,7 @@ public class UserEventListener {
     @EventHandler
     public void on(UserUpdatedEvent event) {
         log.info("_Event:{}", event);
-        UserView userView = userViewRepository.findOne(event.getUserId());
+        UserView userView = userViewRepository.findOne(event.getUserId().toString());
         userView.setEmail(event.getEmail());
         userViewRepository.save(userView);
     }

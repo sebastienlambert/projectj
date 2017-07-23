@@ -69,7 +69,7 @@ public class UserController extends AbstractController {
     public UserDto getUser(@PathVariable UUID userId) {
         log.info("_Controller:getUser:{}", userId);
         // TODO: should create a UserViewService, move NotFoundException in domain and do this logic there
-        UserView user = userViewRepository.findOne(userId);
+        UserView user = userViewRepository.findOne(userId.toString());
         if (user == null) {
             throw new NotFoundException("Can't find user " + userId);
         }

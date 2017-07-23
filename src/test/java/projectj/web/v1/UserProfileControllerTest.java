@@ -64,13 +64,13 @@ public class UserProfileControllerTest {
     public void getUserProfile() throws Exception {
         UUID userId = UUID.fromString("e641f7f0-4d33-4bd4-86e9-53beea9d55aa");
         UserProfileView userProfileView = UserProfileView.builder()
-                .userId(userId)
+                .userId(userId.toString())
                 .nickname("fred")
                 .dob(LocalDate.of(1929, 10, 1))
                 .createdDate(LocalDateTime.of(2017, 7, 8, 1, 8, 10))
                 .lastModifiedDate(LocalDateTime.of(2017, 7, 8, 1, 27, 56))
                 .build();
-        when(userProfileViewRepository.findOne(userId)).thenReturn(userProfileView);
+        when(userProfileViewRepository.findOne(userId.toString())).thenReturn(userProfileView);
         UserProfileDto userProfileDto = userProfileController.getUserProfile(userId);
         assertEquals(userId, userProfileDto.getUserId());
         assertEquals("fred", userProfileDto.getNickname());

@@ -13,6 +13,8 @@ import projectj.api.user.UpdateUserCommand;
 import projectj.query.user.UserView;
 import projectj.shared.DateUtils;
 
+import java.util.UUID;
+
 public class UserMapper {
 
     public CreateUserCommand toCreateUserCommand(UserDto userDto) {
@@ -31,7 +33,7 @@ public class UserMapper {
 
     public UserDto toUserDto(UserView userView) {
         return UserDto.builder()
-                .userId(userView.getUserId())
+                .userId(UUID.fromString(userView.getUserId()))
                 .email(userView.getEmail())
                 .createdDate(DateUtils.toDate(userView.getCreatedDate()))
                 .build();

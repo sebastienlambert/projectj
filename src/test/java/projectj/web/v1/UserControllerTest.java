@@ -71,10 +71,10 @@ public class UserControllerTest {
     public void getUser() throws Exception {
         UUID userId = UUID.fromString("e641f7f0-4d33-4bd4-86e9-53beea9d55aa");
         UserView userView = UserView.builder()
-                .userId(userId)
+                .userId(userId.toString())
                 .email("fred.flinststone@bedrock.net")
                 .build();
-        when(userViewRepository.findOne(userId)).thenReturn(userView);
+        when(userViewRepository.findOne(userId.toString())).thenReturn(userView);
         UserDto userDto = userController.getUser(userId);
         assertEquals("e641f7f0-4d33-4bd4-86e9-53beea9d55aa", userDto.getUserId().toString());
         assertEquals("fred.flinststone@bedrock.net", userDto.getEmail());

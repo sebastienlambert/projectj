@@ -14,6 +14,7 @@ import projectj.shared.DateUtils;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.UUID;
 
 public class UserProfileMapper {
 
@@ -27,7 +28,7 @@ public class UserProfileMapper {
 
     public UserProfileDto toUserProfileDto(UserProfileView userProfileView) {
         return UserProfileDto.builder()
-                .userId(userProfileView.getUserId())
+                .userId(UUID.fromString(userProfileView.getUserId()))
                 .nickname(userProfileView.getNickname())
                 .dob(DateUtils.toDate(userProfileView.getDob()))
                 .createdDate(DateUtils.toDate(userProfileView.getCreatedDate()))

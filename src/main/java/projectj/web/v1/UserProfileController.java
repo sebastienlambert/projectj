@@ -57,7 +57,7 @@ public class UserProfileController extends AbstractController {
     @ResponseBody
     public UserProfileDto getUserProfile(@PathVariable UUID userId) {
         log.info("_Controller:getUserProfile:{}", userId);
-        UserProfileView userProfileView = userProfileViewRepository.findOne(userId);
+        UserProfileView userProfileView = userProfileViewRepository.findOne(userId.toString());
         if (userProfileView == null) {
             throw new NotFoundException(String.format("User profile %s not found", userId));
         }

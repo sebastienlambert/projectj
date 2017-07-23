@@ -17,7 +17,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -30,7 +29,7 @@ import java.util.UUID;
 public class UserView {
 
     @Id
-    private UUID userId;
+    private String userId;
 
     @CreatedDate
     private LocalDateTime createdDate;
