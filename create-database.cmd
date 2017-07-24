@@ -1,10 +1,9 @@
 @echo off
 
 set PROJECT_ID=projectj-174412
-set INSTANCE_NAME=projectj-db3
+set INSTANCE_NAME=projectj-db-instance
 set REGION=asia-east1
-set DATABASE=projectj_db3
-set PROXY_KEY_FILE_PATH=E:\Workspace\Security\sqlclient-projectj-881536405092.json
+set DATABASE=projectj_db
 set INSTANCE_CONNECTION_NAME=%PROJECT_ID%:%REGION%:%INSTANCE_NAME%
 
 
