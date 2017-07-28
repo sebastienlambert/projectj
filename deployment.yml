@@ -4,8 +4,14 @@ metadata:
   name: projectj-deployment
   labels:
     app: projectj-deployment
+
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       labels:
@@ -13,15 +19,30 @@ spec:
     spec:
       #Container details
       containers:
-        - image: asia.gcr.io/projectj-174412/projectj:0.0.1-SNAPSHOT
-          name: projectj-container
+        - name: projectj-container
+          image: asia.gcr.io/projectj-174412/projectj:0.0.1-SNAPSHOT
           imagePullPolicy: Always
           #Ports to expose
           ports:
-          - containerPort: 8443
-
-        - image: gcr.io/cloudsql-docker/gce-proxy:1.09
-          name: cloudsql-proxy-container
+            - containerPort: 8443
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /health
+              port: 8443
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /health
+              port: 8443
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+        - name: cloudsql-proxy-container
+          image: gcr.io/cloudsql-docker/gce-proxy:1.09
           command: ["/cloud_sql_proxy", "--dir=/cloudsql",
                       "-instances=projectj-174412:asia-east1:projectj-db-instance=tcp:3306",
                     "-credential_file=/secrets/cloudsql/credentials.json"]
