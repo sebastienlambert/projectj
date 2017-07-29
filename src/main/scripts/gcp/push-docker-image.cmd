@@ -9,6 +9,7 @@ set VERSION=%mydate%_%mytime%
 set VERSION=0.0.1-SNAPSHOT
 set IMAGE=asia.gcr.io/%PROJECT_ID%/%ARTIFACT%:%VERSION%
 
+pushd ..\..\..\..\
 
 call %M2_HOME%\bin\mvn clean package -DskipTests -Pcontainer
 
@@ -20,3 +21,4 @@ del keystore.p12
 
 call gcloud docker -- push %IMAGE%
 
+popd
